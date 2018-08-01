@@ -1,4 +1,4 @@
 *.rds
 .Rproj.user
 *.db
-/activity/
+/activity
