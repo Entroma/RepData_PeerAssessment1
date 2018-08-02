@@ -1,5 +1,6 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+author: "Pure-Entropy"
 output: 
   html_document:
     keep_md: true
@@ -10,7 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, fig.path = 'figure/') 
 ```
 ## Loading and preprocessing the data
-```{r}
+```{r loading the data}
 # Get he current working directory
 wd <- getwd();
 # Extract the data set if the data set folder does not exists
@@ -26,7 +27,7 @@ ds <- read.csv2('activity/activity.csv', sep = ',')
 
 
 ## What is mean total number of steps taken per day?
-```{r}
+```{r First summaries}
 # Find all Na rows in ds$steps
 x <- is.na(ds$steps)
 # Remove the NA rows and store the new data.frame as df
@@ -73,8 +74,8 @@ hg <- ggplot(sums, aes(x = total.steps)) +
 ggsave(filename = 'histogram.png', plot = hg, device = 'png', path = 'figure/',
        width = 20, height = 15, units = 'cm', dpi = 320)
 ```
-<img src = 'histogram.png' />
-```{r}
+<img src = 'figure/histogram.png' />
+```{r Reporing the values}
 # Mean steps per day
 print('Mean steps a day: ')
 print(sums[,c('date', 'mean.steps')])
@@ -86,7 +87,7 @@ print(sums[c('date', 'median.steps')])
 ```
 
 ## What is the average daily activity pattern?
-```{r}
+```{r Acivity patterns}
 # Create a new data.frame for the mean steps per 5 minute interval
 pattern.df <- df %>% group_by(interval) %>%
   summarise(average.steps = mean(steps))
@@ -101,8 +102,8 @@ ggsave(filename = 'activity pattern.png', plot = hg, device = 'png', path = 'fig
 
   
 ```
-<img src = 'activity pattern.png' />
-```{r}
+<img src = 'figure/activity pattern.png' />
+```{r PAtern report}
 print('The inerval with the highest mean number of steps is: ')
 print(pattern.df[max(pattern.df$average.steps) == pattern.df$average.steps,
                  "interval"])
@@ -110,13 +111,13 @@ print(pattern.df[max(pattern.df$average.steps) == pattern.df$average.steps,
 
 
 ## Imputing missing values
-```{r}
-# Coun the number of rows with Na values
+```{r Couning NA values}
+# Count the number of rows with Na values
 total.nas <- sum((is.na(ds$steps) | is.na(ds$date) | is.na(ds$interval)))
 print('The total number of rows wih an NA value is: ')
 print(total.nas)
 ```
-```{r}
+```{r Impuing missing data}
 # Using the mean value o impute all missing rows:
 full.ds <- ds
 # Fill in the missing data with the mean value. all other columns have no Nas
@@ -161,7 +162,7 @@ ggsave(filename = 'imputed histogram.png', plot = hg, device = 'png', path = 'fi
        width = 20, height = 15, units = 'cm', dpi = 320)
 ```
 <img src = 'figure/imputed histogram.png' />
-```{r}
+```{r Imputed reports}
 print('The mean number of steps taken per day for this dataset is: ')
 print(full.sums$mean.steps)
 ```
@@ -174,7 +175,7 @@ As seen, imputing missing data changes the estimates as follows:
 * The median number of steps per day is non zero on the imputed rows
 * Imputing missing values increases the estimated total number of steps per day
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+```{r Activity patterns by day type}
 # Get the dates, turn them into a Date type, then turn them into week day names
 days <- weekdays.Date(as.Date.factor(full.ds$date))
 # Next we set them to 'weekend', or 'weekday' depending on the day type
@@ -188,9 +189,9 @@ plot.df <- full.ds %>% group_by(interval, day.type) %>%
 hg <- ggplot(data = plot.df, aes(x = interval, y = mean.steps)) + 
   geom_line(col = 'Blue') + ggtitle('Weekday/Weekend Activity patterns') + 
   xlab('5 - Minute interval') + ylab('Average daily steps') + 
-  facet_grid(day.type ~ .)
+  facet_grid(day.type ~ ., switch = 'both')
 # Save the png
 ggsave(filename = 'daytype pattern.png', plot = hg, device = 'png', path = 'figure/',
-       width = 50, height = 20, units = 'cm', dpi = 320)
+       width = 35, height = 20, units = 'cm', dpi = 320)
 ```
-<img src = 'daytype pattern.png' />
+<img src = 'figure/daytype pattern.png' />
