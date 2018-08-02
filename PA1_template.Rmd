@@ -7,7 +7,7 @@ output:
 
 ```{r include=FALSE} 
 # Global Options: 
-knitr::opts_chunk$set(echo = TRUE, tidy = TRUE) 
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, fig.path = 'figure/') 
 ```
 ## Loading and preprocessing the data
 ```{r}
@@ -52,7 +52,7 @@ sums$group <- ifelse(sums$total.steps <= cols[1], 'a',
 # Set a variable to store the alpha value
 a = 0.65
 # Create a histogram of the total steps per day, coloured by quantile group
-ggplot(sums, aes(x = total.steps)) + 
+hg <- ggplot(sums, aes(x = total.steps)) + 
   geom_histogram(binwidth = 450, data = subset(sums, group == 'a'), alpha = a,
                  aes(fill = group)) +
   geom_histogram(binwidth = 450, data = subset(sums, group == 'b'), alpha = a,
@@ -69,8 +69,11 @@ ggplot(sums, aes(x = total.steps)) +
                                'aquamarine'),
                     labels = c('First quartile', 'Second Quartile', 
                                'Mid-range', 'Third Quarile', 'Fourth quartile'))
-
+# now we save the file
+ggsave(filename = 'histogram.png', plot = hg, device = 'png', path = 'figure/',
+       width = 20, height = 15, units = 'cm', dpi = 320)
 ```
+<img src = 'histogram.png' />
 ```{r}
 # Mean steps per day
 print('Mean steps a day: ')
@@ -88,12 +91,17 @@ print(sums[c('date', 'median.steps')])
 pattern.df <- df %>% group_by(interval) %>%
   summarise(average.steps = mean(steps))
 #Plot the data.frame, with an added horizontal line for the overall mean
-ggplot(data = pattern.df, aes(x = interval, y = average.steps)) + geom_line() +
+hg <- ggplot(data = pattern.df, aes(x = interval, y = average.steps)) + geom_line(col = 'brown') +
   xlab('5 - Minute Interval') + ylab('Average Daily Steps') + 
   ggtitle('Daily Activity Pattern') + 
-  geom_hline(yintercept =  mean(df$steps), show.legend = TRUE, aes(col = 'green'))
+  geom_hline(yintercept =  mean(df$steps), show.legend = TRUE, col = 'green')
+# Now we save the png
+ggsave(filename = 'activity pattern.png', plot = hg, device = 'png', path = 'figure/',
+       width = 20, height = 15, units = 'cm', dpi = 320)
+
   
 ```
+<img src = 'activity pattern.png' />
 ```{r}
 print('The inerval with the highest mean number of steps is: ')
 print(pattern.df[max(pattern.df$average.steps) == pattern.df$average.steps,
@@ -131,7 +139,7 @@ full.sums$group <- ifelse(full.sums$total.steps <= cols[1], 'a',
 a = 0.65
 
 # Plot the dataset
-ggplot(full.sums, aes(x = total.steps)) + 
+hg <- ggplot(full.sums, aes(x = total.steps)) + 
   geom_histogram(binwidth = 450, data = subset(full.sums, group == 'a'),
                  alpha = a, aes(fill = group)) +
   geom_histogram(binwidth = 450, data = subset(full.sums, group == 'b'),
@@ -148,7 +156,11 @@ ggplot(full.sums, aes(x = total.steps)) +
                                'aquamarine'),
                     labels = c('First quartile', 'Second Quartile', 
                                'Mid-range', 'Third Quarile', 'Fourth quartile'))
+# Save the png
+ggsave(filename = 'imputed histogram.png', plot = hg, device = 'png', path = 'figure/',
+       width = 20, height = 15, units = 'cm', dpi = 320)
 ```
+<img src = 'figure/imputed histogram.png' />
 ```{r}
 print('The mean number of steps taken per day for this dataset is: ')
 print(full.sums$mean.steps)
@@ -173,8 +185,12 @@ full.ds$day.type <- as.factor(days)
 plot.df <- full.ds %>% group_by(interval, day.type) %>%
   summarise(mean.steps = mean(steps) )
 # Plot the time series data.
-ggplot(data = plot.df, aes(x = interval, y = mean.steps)) + 
+hg <- ggplot(data = plot.df, aes(x = interval, y = mean.steps)) + 
   geom_line(col = 'Blue') + ggtitle('Weekday/Weekend Activity patterns') + 
   xlab('5 - Minute interval') + ylab('Average daily steps') + 
   facet_grid(day.type ~ .)
+# Save the png
+ggsave(filename = 'daytype pattern.png', plot = hg, device = 'png', path = 'figure/',
+       width = 50, height = 20, units = 'cm', dpi = 320)
 ```
+<img src = 'daytype pattern.png' />
